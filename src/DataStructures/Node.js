@@ -40,6 +40,13 @@ const getIndex = (list, node) => {
       let pair = this.adjacents[index];
       return pair[1];
     }
+
+    setWeight(node, weight) {
+      let index = getIndex(this.adjacents, node);
+      let pair = this.adjacents[index];
+      pair[1] = weight;
+
+    }
   
     isAdjacent(node) {
       return getIndex(this.adjacents, node) > -1;

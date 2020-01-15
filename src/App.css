@@ -52,6 +52,10 @@
     background-color: lightgreen;
 }
 
+.node-weight {
+    background-color: purple;
+}
+
 .info{
     height: 600px;
     overflow-y: scroll;

@@ -23,6 +23,7 @@ const addEdge = (graph, node) => {
     }
 }
 
+
 const restoreEdge = (graph, node) => {
     if (node > cols && graph.getVertex(node-cols)) {
         graph.addEdge(node, node-cols);
@@ -35,6 +36,39 @@ const restoreEdge = (graph, node) => {
     }
     if ( (!(node % cols === 0)) && graph.getVertex(node-1)) {
         graph.addEdge(node, node-1);
+    }
+}
+
+const addWeight = (graph, node, weight) => {
+    let nodeClicked = graph.getVertex(node);
+    let nodeAdj = graph.getVertex(node-cols);
+    const isUndirected = graph.edgeDirection === Graph.UNDIRECTED;
+    if (node > cols && nodeAdj) {
+        nodeClicked.setWeight(nodeAdj, weight);
+        if (isUndirected) {
+            nodeAdj.setWeight(nodeClicked, weight)
+        }
+    }
+    nodeAdj = graph.getVertex(node+1)
+    if ((!((node+1)%cols === 0)) && nodeAdj ) {
+        nodeClicked.setWeight(nodeAdj, weight);
+        if (isUndirected) {
+            nodeAdj.setWeight(nodeClicked, weight)
+        }
+    }
+    nodeAdj = graph.getVertex(node+cols);
+    if ( (node + cols <= (rows*cols))  && nodeAdj) {
+        nodeClicked.setWeight(nodeAdj, weight);
+        if (isUndirected) {
+            nodeAdj.setWeight(nodeClicked, weight)
+        }
+    }
+    nodeAdj = graph.getVertex(node-1);
+    if ( (!(node % cols === 0)) && graph.getVertex(node-1)) {
+        nodeClicked.setWeight(nodeAdj, weight);
+        if (isUndirected) {
+            nodeAdj.setWeight(nodeClicked, weight)
+        }
     }
 }
 
@@ -66,6 +100,7 @@ const Pathfinder = () => {
         return "" + (Math.floor(rows/2)*3 + Math.floor(cols/4)*cols)
     });
     const [isDraggin, setIsDraggin] = useState({start:false, end:false});
+    const [addingWall, setAddingWall] = useState(true);
 
     useEffect(() => {
         const newGrid = produce(grid, gridCopy => {
@@ -114,31 +149,38 @@ const Pathfinder = () => {
             runSimulation();
         }
     }
-    const handleDFS = () => {
-        let first = graph.getVertex(0);
-        const visitedPath = graph.dfs2(first);
-        setPath(visitedPath);
-    }
     
     const handleClickDiv = (e) => {
         let clickedVal = parseInt(e.target.getAttribute('value'));
         if (clickedVal == start || clickedVal == end) {
             return;
         }
-        //Modify grid
-        const newGrid = produce(grid, gridCopy => {
-            gridCopy[clickedVal] === "WALL" ? gridCopy[clickedVal] = 0 : gridCopy[clickedVal] =  "WALL";
-        });
-        setGrid(newGrid);
-
-        //Modify graph
-        if (grid[clickedVal] === 0) {
-            graph.removeVertex(clickedVal);
-            //TODO: Recalculate path with selected algo.
+        if (addingWall) {
+            //Modify grid
+            const newGrid = produce(grid, gridCopy => {
+                gridCopy[clickedVal] === "WALL" ? gridCopy[clickedVal] = 0 : gridCopy[clickedVal] =  "WALL";
+            });
+            setGrid(newGrid);
+    
+            //Modify graph
+            if (grid[clickedVal] === 0) {
+                graph.removeVertex(clickedVal);
+                //TODO: Recalculate path with selected algo.
+            }
+            else if (grid[clickedVal] === "WALL") {
+                graph.addVertex(clickedVal);
+                restoreEdge(graph, clickedVal);
+            }
         }
-        else if (grid[clickedVal] === "WALL") {
-            graph.addVertex(clickedVal);
-            restoreEdge(graph, clickedVal);
+
+        //Add weight
+        else if (grid[clickedVal] !== "WALL"){
+            let weight = 10;
+            addWeight(graph, clickedVal,weight);
+            const newGrid = produce(grid, gridCopy => {
+                gridCopy[clickedVal] === "WEIGHT" ? gridCopy[clickedVal] = 0 : gridCopy[clickedVal] =  "WEIGHT";
+            });
+            setGrid(newGrid);
         }
     }
 
@@ -166,6 +208,9 @@ const Pathfinder = () => {
         }
         else if (value === "END") {
             return 'node-end';
+        }
+        else if (value === "WEIGHT") {
+            return 'node-weight';
         }
         else {
             return ''
@@ -257,6 +302,7 @@ const Pathfinder = () => {
                 <button onClick={() => runClick()}>{running ? 'stop' : 'start'}</button>
                 <button onClick={() => handleClear()}>Clear</button>
                 <button onClick={() => runAlgo(selectedAlgorithm)}>Run algo</button>
+                <button onClick={() => setAddingWall(!addingWall)}>{addingWall ? "Adding Wall" : "Adding weight"}</button>
                 <button onClick={() => test()}>show start and end</button>
             </div>
 

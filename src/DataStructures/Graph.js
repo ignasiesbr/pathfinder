@@ -76,7 +76,7 @@ class Graph {
       let val = node[1].getValue();
       node[1]
         .getAdjacents()
-        .forEach(adj => (s += `( ${val} , ${adj.getValue()} )` + "\n"));
+        .forEach(adj => (s += `( ${val} , ${adj.getValue()} , ${node[1].getWeight(adj)} )` + "\n"));
     }
     return s;
   }
