@@ -2,8 +2,8 @@ import React, {useState, useCallback, useRef, useEffect} from 'react'
 import produce from 'immer';
 import Graph from '../DataStructures/Graph';
 
-const rows = 3;
-const cols = 5;
+const rows = 5;
+const cols = 8;
 
 const generateEmptyGrid = () => {
     return new Array(rows*cols).fill(0);
@@ -60,11 +60,12 @@ const Pathfinder = () => {
     });
 
     const [start, setStart] = useState( () => {
-        return (Math.floor(rows/2) + Math.floor(cols/4)*cols)
+        return "" + (Math.floor(rows/2) + Math.floor(cols/4)*cols)
     });
     const [end, setEnd] = useState(() => {
-        return (Math.floor(rows/2)*3 + Math.floor(cols/4)*cols)
+        return "" + (Math.floor(rows/2)*3 + Math.floor(cols/4)*cols)
     });
+    const [isDraggin, setIsDraggin] = useState({start:false, end:false});
 
     useEffect(() => {
         const newGrid = produce(grid, gridCopy => {
@@ -72,7 +73,7 @@ const Pathfinder = () => {
             gridCopy[end] = "END";
         });
         setGrid(newGrid);
-    }, [start,end])
+    }, [start,end, graph])
 
     const [selectedAlgorithm, setAlgo] = useState(0);
 
@@ -80,15 +81,13 @@ const Pathfinder = () => {
     const pathRef = useRef(path);
     pathRef.current = path;
 
+    const [foundPath, setFoundPath] = useState([]);
+    const foundPathRef = useRef(foundPath);
+    foundPathRef.current = foundPath;
+
     const [running, setRunning] = useState(false);
     const runningRef = useRef(running);
     runningRef.current = running;
-
-    const handleClickTest = () => {
-        const first = graph.getVertex(0);
-        const visitedOrder = graph.bfs2(first);
-        setPath(visitedOrder);
-    }
 
     const runSimulation = useCallback(visitList => {
         if (!runningRef.current || pathRef.current.length === 0) {
@@ -97,6 +96,7 @@ const Pathfinder = () => {
         }
         //simulate.
         let idx = pathRef.current[0];
+        console.log(idx == end);
         const newGrid = produce(gridRef.current, gridCopy => {
             gridCopy[idx] = 1;
             
@@ -120,9 +120,11 @@ const Pathfinder = () => {
         setPath(visitedPath);
     }
     
-    const addWall = (e) => {
+    const handleClickDiv = (e) => {
         let clickedVal = parseInt(e.target.getAttribute('value'));
-
+        if (clickedVal == start || clickedVal == end) {
+            return;
+        }
         //Modify grid
         const newGrid = produce(grid, gridCopy => {
             gridCopy[clickedVal] === "WALL" ? gridCopy[clickedVal] = 0 : gridCopy[clickedVal] =  "WALL";
@@ -143,22 +145,16 @@ const Pathfinder = () => {
     const handleClear = () => {
         const newGraph = generateGraph();
         setGraph(newGraph);
-        setGrid(new Array(rows*cols).fill(0))
+        setGrid(new Array(rows*cols).fill(0));
     }
 
-    const runAlgo = () => {
-        let startNode = graph.getVertex(start);
-        setPath(graph.getAlgo(selectedAlgorithm)(startNode));
+    const runAlgo = (algo) => {
+        let startNode = graph.getVertex(parseInt(start));
+        setPath(graph.getAlgo(algo).bind(graph)(startNode))
     }
 
-    const handleDropdownChange = e => {
-        setAlgo(e.target.value);
-        runAlgo();
-        console.log(path)
-    }
 
     const generateClassName = (value) => {
-        console.log(value);
         if (value === 1) {
             return 'node-visited';
         }
@@ -176,12 +172,73 @@ const Pathfinder = () => {
         }
     }
 
+    //HANDLE ALGORITHM DROPDOWN
+    const handleDropdownChange = e => {
+        setAlgo(e.target.value);
+        runAlgo(e.target.value);
+        setGraph(generateGraph());
+    }
+
+    // DRAG HANDLING
+    //______________
+    const handleDragStart =  e => {
+        if (e.target.getAttribute('value') == start ) {
+            setIsDraggin({start:true, end: false});
+        }
+        if (e.target.getAttribute('value') == end) {
+            setIsDraggin({start:false, end:true});
+        }
+    }
+    const handleDrag = e => {
+        let isDragginStart = isDraggin.start;
+        let isDragginEnd = isDraggin.end;
+        
+        if (!isDragginStart && !isDragginEnd) {
+            return;
+        }
+        if (isDragginStart) {
+            let newCell = e.target.getAttribute("value");
+            if (newCell !== start) {
+                let newGrid = produce(grid, gridCopy => {
+                    gridCopy[start] = 0;
+                });
+                setGrid(newGrid);
+                setStart(newCell);
+            }
+        }
+        
+        if (isDragginEnd) {
+            let newCell = e.target.getAttribute("value");
+            if (newCell !== end) {
+                let newGrid = produce(grid, gridCopy => {
+                    gridCopy[end] = 0;
+                });
+                setGrid(newGrid);
+                setEnd(newCell);
+            }
+        }
+    };
+    const handleDragEnd = () => {
+        setIsDraggin(false);
+        runAlgo(selectedAlgorithm);
+    }
+
+
+
+    const test = () => {
+        console.log(start, end);
+    }
     return (
         <div className="container">
             <div className="grid">
                 {grid.map((cell, idx) => (
-                    <div value={idx}
-                    onClick={(e) => addWall(e)}
+                    <div 
+                        draggable
+                        onDragEnd={() => handleDragEnd()}
+                        onDragStart={e => handleDragStart(e)}
+                        onDragOver={e => handleDrag(e)}
+                        value={idx}
+                        onClick={(e) => handleClickDiv(e)}
                         key={idx} className={`node ${generateClassName(cell)}`}>
                     </div>
                 ))}
@@ -190,6 +247,7 @@ const Pathfinder = () => {
                 <select onChange={(e) => handleDropdownChange(e)} name="" id="">
                     <option value="0">BFS</option>
                     <option value="1">DFS</option>
+                    <option value="2">Dijkstra</option>
                 </select>
             </div>
             <div className="buttons">
@@ -198,7 +256,8 @@ const Pathfinder = () => {
                 <button onClick={() => console.log(path)}>Show path</button>
                 <button onClick={() => runClick()}>{running ? 'stop' : 'start'}</button>
                 <button onClick={() => handleClear()}>Clear</button>
-                <button onClick={() => runAlgo()}>Run algo</button>
+                <button onClick={() => runAlgo(selectedAlgorithm)}>Run algo</button>
+                <button onClick={() => test()}>show start and end</button>
             </div>
 
             <div className="info">

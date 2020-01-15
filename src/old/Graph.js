@@ -15,7 +15,6 @@ const Graph = ({rows, cols}) => {
     };
 
     const addVertex = (value) => {
-        console.log('adding vertex')
         if (nodes.has(value)) {
             return nodes.get(value);
         }
@@ -23,7 +22,6 @@ const Graph = ({rows, cols}) => {
             const vertex = Node(value);
             setNodes(nodes.set(value, vertex));
             console.log(nodes);
-            console.log('______');
             return vertex;
         }
     }

@@ -35,7 +35,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(5, 1.5rem);
+    grid-template-columns: repeat(8, 1.5rem);
 }
 
 .app {
@@ -44,10 +44,15 @@
     justify-content: center;
     height: 100vh;
 }
-
+ 
+.node-end {
+    background-color: orange;
+}
 .node-start {
     background-color: lightgreen;
 }
-.node-end {
-    background-color: orange;
+
+.info{
+    height: 600px;
+    overflow-y: scroll;
 }

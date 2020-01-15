@@ -1,67 +1,89 @@
-const top = 0;
-const parent = i => ((i + 1) >>> 1) - 1;
-const left = i => (i << 1) + 1;
-const right = i => (i + 1) << 1;
-
 class PriorityQueue {
-  constructor(comparator = (a, b) => a > b) {
-    this._heap = [];
-    this._comparator = comparator;
+  constructor() {
+    this.heapArray = [[0, 0]];
+    this.currentSize = 0;
   }
-  size() {
-    return this._heap.length;
+
+  printHeap() {
+    console.log(this.heapArray);
   }
+
+  percDown(i) {
+    while (i * 2 <= this.currentSize) {
+      let mc = this.minChild(i);
+      if (this.heapArray[i][0] > this.heapArray[mc][0]) {
+        let tmp = this.heapArray[i];
+        this.heapArray[i] = this.heapArray[mc];
+        this.heapArray[mc] = tmp;
+      }
+      i = mc;
+    }
+  }
+
+  minChild(i) {
+    if (i * 2 > this.currentSize) {
+      return -1;
+    } else {
+      if (i * 2 + 1 > this.currentSize) {
+        return i * 2;
+      } else {
+        if (this.heapArray[i * 2][0] < this.heapArray[i * 2 + 1][0]) {
+          return i * 2;
+        } else {
+          return i * 2 + 1;
+        }
+      }
+    }
+  }
+
+  percUp(i) {
+    while (Math.floor(i / 2) > 0) {
+      if (this.heapArray[i][0] < this.heapArray[Math.floor(i / 2)][0]) {
+        let tmp = this.heapArray[Math.floor(i / 2)];
+        this.heapArray[Math.floor(i / 2)] = this.heapArray[i];
+        this.heapArray[i] = tmp;
+      }
+      i = Math.floor(i / 2);
+    }
+  }
+
+  add(k) {
+    this.heapArray.push(k);
+    this.currentSize += 1;
+    this.percUp(this.currentSize);
+  }
+
+  delMin() {
+    let retval = this.heapArray[1][1];
+    this.heapArray[1] = this.heapArray[this.currentSize];
+    this.currentSize = this.currentSize - 1;
+    this.heapArray.pop();
+    this.percDown(1);
+    return retval;
+  }
+
   isEmpty() {
-    return this.size() == 0;
+    return this.currentSize === 0;
   }
-  peek() {
-    return this._heap[top];
-  }
-  push(...values) {
-    values.forEach(value => {
-      this._heap.push(value);
-      this._siftUp();
-    });
-    return this.size();
-  }
-  pop() {
-    const poppedValue = this.peek();
-    const bottom = this.size() - 1;
-    if (bottom > top) {
-      this._swap(top, bottom);
+
+  decreaseKey(val, amt) {
+    // console.log(val);
+    let done = false;
+    let i = 1;
+    let mKey = 0;
+    while (!done && i <= this.currentSize) {
+      // console.log(this.heapArray[i][1]);
+      if (this.heapArray[i][1].getValue() === val.getValue()) {
+        // console.log("gets to decreasekye");
+        done = true;
+        mKey = i;
+      } else {
+        i = i + 1;
+      }
     }
-    this._heap.pop();
-    this._siftDown();
-    return poppedValue;
-  }
-  replace(value) {
-    const replacedValue = this.peek();
-    this._heap[top] = value;
-    this._siftDown();
-    return replacedValue;
-  }
-  _greater(i, j) {
-    return this._comparator(this._heap[i], this._heap[j]);
-  }
-  _swap(i, j) {
-    [this._heap[i], this._heap[j]] = [this._heap[j], this._heap[i]];
-  }
-  _siftUp() {
-    let node = this.size() - 1;
-    while (node > top && this._greater(node, parent(node))) {
-      this._swap(node, parent(node));
-      node = parent(node);
-    }
-  }
-  _siftDown() {
-    let node = top;
-    while (
-      (left(node) < this.size() && this._greater(left(node), node)) ||
-      (right(node) < this.size() && this._greater(right(node), node))
-    ) {
-      let maxChild = (right(node) < this.size() && this._greater(right(node), left(node))) ? right(node) : left(node);
-      this._swap(node, maxChild);
-      node = maxChild;
+    if (mKey > 0) {
+      this.heapArray[mKey] = [amt, this.heapArray[mKey][1]];
+      this.percUp(mKey);
     }
   }
 }
