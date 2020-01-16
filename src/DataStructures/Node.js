@@ -15,6 +15,7 @@ const getIndex = (list, node) => {
     constructor(value) {
       this.value = value;
       this.adjacents = [];
+      this.pred = null;
       this.distance = Number.MAX_SAFE_INTEGER;
     }
   
@@ -22,6 +23,14 @@ const getIndex = (list, node) => {
       this.adjacents.push([node, weight]);
     }
   
+    setPred(p) {
+      this.pred = p;
+    }
+
+    getPred() {
+      return this.pred
+    }
+
     removeAdjacent(node) {
       let index = getIndex(this.adjacents, node);
       if (index > -1) {

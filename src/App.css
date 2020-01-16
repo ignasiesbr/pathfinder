@@ -55,6 +55,9 @@
 .node-weight {
     background-color: purple;
 }
+.node-found{
+    background-color: yellow;
+}
 
 .info{
     height: 600px;

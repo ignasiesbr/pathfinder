@@ -81,6 +81,33 @@ const generateGraph = () => {
     return graph;
 }
 
+const getPredList = (node, start) => {
+    let max = 1000;
+    let count = 0;
+    let done = false;
+    let list = [node.getValue()];
+    let current = node;
+    while (!done) {
+        if (!current.getPred() || count >= max || current.getValue() == start) {
+            done = true;
+        }
+        else {
+            count++;
+            current = current.getPred();
+            list.push(current.getValue());
+        }
+    }
+    return list.reverse();
+}
+
+const getFoundBfsDfs = (start, end, path) => {
+    let index1 = path.indexOf(parseInt(start));
+    let index2 = path.indexOf(parseInt(end));
+    let res = path.slice(index1,index2+1);
+    console.log(res);
+    return res
+
+}
 
 const Pathfinder = () => {
     const [grid, setGrid] = useState(() => {
@@ -124,23 +151,45 @@ const Pathfinder = () => {
     const runningRef = useRef(running);
     runningRef.current = running;
 
-    const runSimulation = useCallback(visitList => {
+    const [runningFound, setRunningFound] = useState(false);
+
+    const runSimulation = useCallback(() => {
         if (!runningRef.current || pathRef.current.length === 0) {
             setRunning(false);
             return;
         }
         //simulate.
         let idx = pathRef.current[0];
-        console.log(idx == end);
-        const newGrid = produce(gridRef.current, gridCopy => {
-            gridCopy[idx] = 1;
-            
-        });
-        setGrid(newGrid);
-        setPath(pathRef.current.slice(1));
-        setTimeout(runSimulation, 100);
+        if (idx == end) {
+            setRunning(false);
+            setRunningFound(true);
+            runFoundAnimation();
+        }
+        else {
+            const newGrid = produce(gridRef.current, gridCopy => {
+                gridCopy[idx] = 1;
+                
+            });
+            setGrid(newGrid);
+            setPath(pathRef.current.slice(1));
+            setTimeout(runSimulation, 100);
+        }
     }, []);
 
+
+    const runFoundAnimation = () => {
+        if (foundPathRef.current.length === 0) {
+            setRunningFound(false);
+            return;
+        }
+        let idx = foundPathRef.current[0];
+        const newGrid = produce(gridRef.current, gridCopy => {
+            gridCopy[idx] = "FOUND";
+        });
+        setGrid(newGrid);
+        setFoundPath(foundPathRef.current.slice(1));
+        setTimeout(runFoundAnimation, 100);
+    }
 
     const runClick = () => {
         setRunning(!running);
@@ -174,8 +223,17 @@ const Pathfinder = () => {
         }
 
         //Add weight
-        else if (grid[clickedVal] !== "WALL"){
+        else if (grid[clickedVal] == 0){
             let weight = 10;
+            addWeight(graph, clickedVal,weight);
+            const newGrid = produce(grid, gridCopy => {
+                gridCopy[clickedVal] === "WEIGHT" ? gridCopy[clickedVal] = 0 : gridCopy[clickedVal] =  "WEIGHT";
+            });
+            setGrid(newGrid);
+        }
+
+        else if(grid[clickedVal] === "WEIGHT") {
+            let weight = 1;
             addWeight(graph, clickedVal,weight);
             const newGrid = produce(grid, gridCopy => {
                 gridCopy[clickedVal] === "WEIGHT" ? gridCopy[clickedVal] = 0 : gridCopy[clickedVal] =  "WEIGHT";
@@ -192,7 +250,9 @@ const Pathfinder = () => {
 
     const runAlgo = (algo) => {
         let startNode = graph.getVertex(parseInt(start));
-        setPath(graph.getAlgo(algo).bind(graph)(startNode))
+        let path = graph.getAlgo(algo).bind(graph)(startNode);
+        setPath(path);
+        return path;
     }
 
 
@@ -212,6 +272,9 @@ const Pathfinder = () => {
         else if (value === "WEIGHT") {
             return 'node-weight';
         }
+        else if (value === "FOUND") {
+            return 'node-found';
+        }
         else {
             return ''
         }
@@ -220,8 +283,9 @@ const Pathfinder = () => {
     //HANDLE ALGORITHM DROPDOWN
     const handleDropdownChange = e => {
         setAlgo(e.target.value);
-        runAlgo(e.target.value);
-        setGraph(generateGraph());
+        let p = runAlgo(e.target.value);
+        setFoundPath(getFoundBfsDfs(start, end, p));
+        // setGraph(generateGraph());
     }
 
     // DRAG HANDLING
@@ -272,6 +336,14 @@ const Pathfinder = () => {
 
     const test = () => {
         console.log(start, end);
+        runAlgo(2);
+        console.log(end);
+        let endNode = graph.getVertex(parseInt(end));
+        console.log(endNode);
+        let resList = getPredList(endNode, parseInt(start));
+        setFoundPath(resList);
+        console.log(resList);
+        runFoundAnimation();
     }
     return (
         <div className="container">
@@ -304,6 +376,7 @@ const Pathfinder = () => {
                 <button onClick={() => runAlgo(selectedAlgorithm)}>Run algo</button>
                 <button onClick={() => setAddingWall(!addingWall)}>{addingWall ? "Adding Wall" : "Adding weight"}</button>
                 <button onClick={() => test()}>show start and end</button>
+                <button onClick={() => console.log(foundPath)}>Show found path</button>
             </div>
 
             <div className="info">

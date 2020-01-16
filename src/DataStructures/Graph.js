@@ -9,7 +9,7 @@ class Graph {
     this.edgeDirection = edgeDirection;
   }
 
-  addEdge(source, destination, weight = 0) {
+  addEdge(source, destination, weight = 1) {
     const sourceNode = this.addVertex(source);
     const destinationNode = this.addVertex(destination);
 
@@ -64,7 +64,7 @@ class Graph {
         .getAdjacents()
         .forEach(adj =>
           console.log(
-            `( ${val} , ${adj.getValue()}, weight: ${node[1].getWeight(adj)} )`
+            `( ${val} , ${adj.getValue()}, weight: ${node[1].getWeight(adj)}, dist: ${node[1].getDistance()} )`
           )
         );
     }
@@ -157,12 +157,28 @@ class Graph {
     return visitedList;
   }
 
+  setToInfinity(start) {
+    //BFS through setting to MAXSAFE INTEGER.
+    const visited = new Map();
+    const visitList  = new Stack();
+
+    visitList.push(start);
+    while(!visitList.isEmpty()) {
+      const node = visitList.pop();
+      if (node && !visited.has(node)) {
+        visited.set(node);
+        node.setDistance(Number.MAX_SAFE_INTEGER);
+        node.getAdjacents().forEach(adj => visitList.push(adj));
+      }
+    }
+  } 
+
   dijkstra(start) {
     console.log('running dijkstra');
+    graph.setToInfinity(start);
     let dijkstra = [start];
     let pq = new PriorityQueue();
     start.setDistance(0);
-    // this.dijkstra.bind(this);
     for (let node of this.nodes) {
       pq.add([node[1].getDistance(), node[1]]);
     }
@@ -173,10 +189,12 @@ class Graph {
         // console.log(' - :',nextNode.getValue())
         let newDist =
           currentNode.getDistance() + currentNode.getWeight(nextNode);
-        if (newDist < nextNode.getDistance()) {
+        // console.log('new dist:' , newDist, 'next idst:', nextNode.getDistance())
+        if (newDist <= nextNode.getDistance()) {
           nextNode.setDistance(newDist);
           dijkstra.push(nextNode);
           pq.decreaseKey(nextNode, newDist);
+          nextNode.setPred(currentNode);
         }
       }
     }
