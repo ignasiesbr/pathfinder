@@ -2,6 +2,17 @@ import Node from "./Node";
 import Queue from "./Queue";
 import Stack from "./Stack";
 import PriorityQueue from "./PriorityQueue";
+import {cols, rows}  from '../utils/constants';
+
+let calculateY = (endValue, acc) => {
+  if (endValue < cols) {
+    return acc;
+  } else {
+    let newVal = endValue - cols;
+    let newAcc = acc + 1;
+    return calculateY(newVal, newAcc);
+  }
+};
 
 class Graph {
   constructor(edgeDirection = Graph.DIRECTED) {
@@ -64,7 +75,9 @@ class Graph {
         .getAdjacents()
         .forEach(adj =>
           console.log(
-            `( ${val} , ${adj.getValue()}, weight: ${node[1].getWeight(adj)}, dist: ${node[1].getDistance()} )`
+            `( ${val} , ${adj.getValue()}, weight: ${node[1].getWeight(
+              adj
+            )}, dist: ${node[1].getDistance()} )`
           )
         );
     }
@@ -76,7 +89,12 @@ class Graph {
       let val = node[1].getValue();
       node[1]
         .getAdjacents()
-        .forEach(adj => (s += `( ${val} , ${adj.getValue()} , ${node[1].getWeight(adj)} )` + "\n"));
+        .forEach(
+          adj =>
+            (s +=
+              `( ${val} , ${adj.getValue()} , ${node[1].getWeight(adj)} )` +
+              "\n")
+        );
     }
     return s;
   }
@@ -118,10 +136,10 @@ class Graph {
   }
 
   bfs2(first) {
-    console.log('running bfs');
+    console.log("running bfs");
     const visited = new Map();
     const visitList = new Queue();
-
+    this.setToInfinity();
     visitList.add(first);
 
     const visitedList = [];
@@ -131,16 +149,22 @@ class Graph {
       if (node && !visited.has(node)) {
         visitedList.push(node.value);
         visited.set(node);
-        node.getAdjacents().forEach(adj => visitList.add(adj));
+        node.getAdjacents().forEach(adj => {
+          visitList.add(adj);
+          if (!adj.getPred()) {
+            adj.setPred(node);
+          }
+        });
       }
     }
     return visitedList;
   }
 
   dfs2(first) {
-    console.log('running dfs');
+    console.log("running dfs");
     const visited = new Map();
     const visitList = new Stack();
+    this.setToInfinity();
 
     visitList.push(first);
 
@@ -151,7 +175,12 @@ class Graph {
       if (node && !visited.has(node)) {
         visitedList.push(node.value);
         visited.set(node);
-        node.getAdjacents().forEach(adj => visitList.push(adj));
+        node.getAdjacents().forEach(adj => {
+          visitList.push(adj);
+          if (!adj.getPred()) {
+            adj.setPred(node);
+          }
+        });
       }
     }
     return visitedList;
@@ -160,21 +189,21 @@ class Graph {
   setToInfinity(start) {
     //BFS through setting to MAXSAFE INTEGER.
     const visited = new Map();
-    const visitList  = new Stack();
-
+    const visitList = new Stack();
     visitList.push(start);
-    while(!visitList.isEmpty()) {
+    while (!visitList.isEmpty()) {
       const node = visitList.pop();
       if (node && !visited.has(node)) {
         visited.set(node);
         node.setDistance(Number.MAX_SAFE_INTEGER);
+        node.setPred(null);
         node.getAdjacents().forEach(adj => visitList.push(adj));
       }
     }
-  } 
+  }
 
   dijkstra(start) {
-    console.log('running dijkstra');
+    console.log("running dijkstra");
     graph.setToInfinity(start);
     let dijkstra = [start];
     let pq = new PriorityQueue();
@@ -201,8 +230,83 @@ class Graph {
     return dijkstra.map(node => node.getValue());
   }
 
+  a_star(startNode, endNode) {
+    console.log('running a * ');
+    let openList = [];
+    let closedList = [];
+    let visited = [startNode.getValue()];
+
+    startNode.g = startNode.h = startNode.f = 0;
+
+    endNode.g = endNode.h = endNode.f = 0;
+    let xEnd = endNode.getValue() % cols;
+    let yEnd = calculateY(endNode.getValue(), 0);
+
+    openList.push(startNode);
+    while (openList.length > 0) {
+      let current = openList[0];
+      let currentIndex = 0;
+      let index = 0;
+      for (let node of openList) {
+        if (node.f < current.f) {
+          current = node;
+          currentIndex = index;
+        }
+        index++;
+      }
+
+      openList = openList
+        .slice(0, currentIndex)
+        .concat(openList.slice(currentIndex + 1));
+      closedList.push(current);
+      if (current.getValue() === endNode.getValue()) {
+        let path = [];
+        let curr = current;
+        startNode.setPred(null)
+        while (curr) {
+          path.push(curr.getValue());
+          curr = curr.getPred();
+        }
+        return [path.reverse(), visited];
+      }
+
+      //iterate through adjacent
+      for (let node of current.getAdjacents()) {
+        visited.push(node.getValue());
+        let inClosedList = closedList.filter(
+          closedNode => node.getValue() === closedNode.getValue()
+        );
+        if (inClosedList.length === 0) {
+          //Create g,h,f for node
+          node.g = current.getWeight(node) + current.g;
+          //heuristic calc.
+          let xCurr = node.getValue() % cols;
+          let yCurr = calculateY(node.getValue(), 0);
+          node.h = Math.pow(xCurr - xEnd, 2) + Math.pow(yCurr - yEnd, 2);
+          node.f = node.h + node.g;
+
+          //If node in openList continue to beggining forloop
+          let cont = true;
+          for (let openNode of openList) {
+            if (
+              node.getValue() === openNode.getValue() &&
+              node.g >= openNode.g
+            ) {
+              cont = false;
+            }
+          }
+
+          if (cont) {
+            node.setPred(current);
+            openList.push(node);
+          }
+        }
+      }
+    }
+  }
+
   getAlgo(pos) {
-    let algos = [this.bfs2, this.dfs2, this.dijkstra];
+    let algos = [this.bfs2, this.dfs2, this.dijkstra, this.a_star];
     return algos[pos];
   }
 }

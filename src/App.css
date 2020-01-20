@@ -35,7 +35,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(8, 1.5rem);
+    grid-template-columns: repeat(30, 1.5rem);
 }
 
 .app {
@@ -62,4 +62,9 @@
 .info{
     height: 600px;
     overflow-y: scroll;
+}
+
+.debug {
+    display: flex;
+    flex-direction: column;
 }
