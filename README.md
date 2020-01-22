@@ -1,6 +1,6 @@
 # Pathfinder grid visualizer using React.
 
-This educational project can be checked in action in <https://ignasiesbr.github.io/pathfinder-react/>
+This educational project can be checked in action in <https://ignasiesbr.github.io/pathfinder/>
 
 The algorithms implemented in this moment are:
 
