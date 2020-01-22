@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useRef} from 'react'
 import { connect } from 'react-redux';
 import {setStart, setGrid, setLatestDrag, setDragging, setItemDragging, setGraphChange} from '../AlgoSlice';
 
@@ -28,7 +28,7 @@ const generateClassName = (value) => {
 
 const Cell2 = React.memo(({value, cellVal, setLatestDrag, setDragging, setItemDragging, addingWall, setGrid, setGraphChange}) => {
 
-    const handleClick = (e) => {
+    const handleClick = () => {
         let newVal;
         //ADDING WALL
         if (addingWall) {
@@ -64,7 +64,7 @@ const Cell2 = React.memo(({value, cellVal, setLatestDrag, setDragging, setItemDr
             onDragEnd={() => {
                 setDragging(false);
             }}
-            onClick={(e) => handleClick(e)}
+            onClick={() => handleClick()}
             value={value}
             className={`node ${generateClassName(cellVal)}`}>
         </div>
@@ -75,6 +75,6 @@ const mapStateToProps = state => ({
     addingWall: state.addingWall
 })
 
-const mapDispatch = {setStart, setGrid, setLatestDrag, setDragging, setItemDragging, setGrid, setGraphChange}
+const mapDispatch = {setStart, setGrid, setLatestDrag, setDragging, setItemDragging, setGraphChange}
 
 export default connect(mapStateToProps, mapDispatch)(Cell2);

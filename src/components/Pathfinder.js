@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {restoreEdge, addWeight, generateGraph ,getPredList} from '../utils/helpersGraph';
 
 import {setStart, setEnd, setItemDragging} from '../AlgoSlice';
-import {setGrid, clearGrid, setVisitPath, setDragging, setAddingWall}  from '../AlgoSlice';
+import {setGrid, clearGrid, setVisitPath, setDragging, setAddingWall,}  from '../AlgoSlice';
 import Cell2 from './Cell2';
 
 
@@ -81,6 +81,8 @@ const Pathfinder = ({start, end, setStart, setEnd, grid, setGrid, clearGrid,
                     let paths = graph.getAlgo(selectedRef.current).bind(graph)(startNode, endNode);
                     setVisitPath(paths[1]);
                     runSimulation(paths[1], paths[0]);
+                default:
+                    return;
             }
         }
     }, [graph]);
@@ -91,11 +93,12 @@ const Pathfinder = ({start, end, setStart, setEnd, grid, setGrid, clearGrid,
         clearGrid();
     }
 
+
     const removeOthers = () => {
         grid.map((cell, idx) => {
             if (cell !== 0) {
-                if (idx === start || idx === end) {
-
+                if (idx === start || idx === end || grid[idx] === "WALL" || grid[idx] === "WEIGHT") {
+                    
                 }
                 else {
                     setGrid(idx, 0);
@@ -154,9 +157,9 @@ const Pathfinder = ({start, end, setStart, setEnd, grid, setGrid, clearGrid,
             <div>
             </div>    
             <div className="buttons">
-                <button onClick={() => runClick()}>{running ? 'STOP' : 'START'}</button>
-                <button onClick={() => handleClear()}>Clear</button>
-                <button onClick={() => setAddingWall(!addingWall)}>{addingWall ? "Adding Wall" : "Adding weight"}</button>
+                <button className="button" onClick={() => runClick()}>{running ? 'STOP' : 'START'}</button>
+                <button className="button" onClick={() => handleClear()}>Clear All</button>
+                <button className="button" onClick={() => setAddingWall(!addingWall)}>{addingWall ? "Adding Wall" : "Adding weight"}</button>
             </div>
         </div>
     )

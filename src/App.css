@@ -2,31 +2,145 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Source Sans Pro', sans-serif;
 }
+
 
 .container {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     width: 100%;
+    flex-direction: column;
+    margin-top: 1.5rem;
+}
 
+.header {
+    margin-bottom: 1.5rem;
+    width: 100%;
+    display: flex;
+    background-color: #139A43;;
+    color: #fff;
+    height: 100%;
+    align-items: center;
+}
+/* INFO */
+
+.algo-info {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.legend {
+    border: 1px solid black;
+    margin-left: 3rem;
+    padding: .5rem 1rem;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.legend p {
+    display: flex;
+    align-items: center;
+    margin: .5rem 0;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    border-radius: 3px;
+    margin-right: .5rem;
+}
+
+.legend-color__start {
+    background-color: lightgreen;
+}
+.legend-color__end {
+    background-color: orange;
+
+}
+.legend-color__wall {
+    background-color: black;
+
+}
+.legend-color__weight {
+    background-color: purple;
+}
+.legend-color__visited {
+    background-color: lightgray;
+}
+.legend-color__found {
+    background-color: yellow;
+}
+
+
+
+.logo {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-left: 3rem;
+    font-size: 25px;
+    margin-right: 25rem;
+    display: flex;
+    align-items: center;
+    /* margin-right: auto; */
 }
 
 .buttons {
     display: flex;
     flex-grow: 0;
-    height: 30px; 
+    height: 100%;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 1rem;
+
+}
+
+.button {
+    text-transform: uppercase;
+    display: block;
+    padding: .5rem;
+    margin-top: 1rem;
+    /* height: 100%; */
+    border: none;
+    color: white;
+    background-color: #0B5D1E;
+    font-weight: 700;
+    border-radius: 100px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all .3s;
+    width: 150px;
+    height: 40px;
+}
+.button:hover {
+    background-color: #139A43;
+    transform: translateY(-.5rem);
+    box-shadow: 0 5px rgba(0, 0, 0, 0.15);
+}
+.button:active {
+    background-color: #053B06;
+    transform: translateY(-.1rem);
+    box-shadow: 0 2px rgba(0, 0, 0, 0.3);
 }
 
 .node {
     border: 1px solid black;
     display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 2rem;
+    height: 2rem;
+    transition: all .5s;
+    transform: scale(1);
 }
 
 .node-visited {
     background-color: lightgrey;
+    animation-duration: .3s;
+    animation-name: anim;
+    transition: all .5s;
 }
 
 .node-wall {
@@ -35,7 +149,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(30, 1.5rem);
+    grid-template-columns: repeat(46, 2rem);
 }
 
 .app {
@@ -43,8 +157,9 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+    flex-direction: column;
 }
- 
+
 .node-end {
     background-color: orange;
 }
@@ -57,6 +172,7 @@
 }
 .node-found{
     background-color: yellow;
+
 }
 
 .info{
@@ -67,4 +183,79 @@
 .debug {
     display: flex;
     flex-direction: column;
+}
+
+/* dropdown */
+
+/* algorithms button */
+
+.dropdown {
+    position: relative;
+}
+.dropdown button {
+    border: none;
+    font-size: 25px;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.dropdown button:focus + .dropdown-list {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.dropdown-list  {
+    width: 200px;
+    position: absolute;
+    opacity: 0;
+    transition: all .3s;
+    z-index: 2;
+    pointer-events: none;
+}
+
+
+.dropdown-list__item {
+    list-style: none;
+    width: 100%;
+    height: 100%;
+}
+
+.dropdown-list__item a {
+    text-decoration: none;
+    background: #139A43;;
+    color: white;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border: none;
+    font-size: 20px;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+.dropdown-list__item a:hover {
+    background: #0B5D1E;
+    border: none;
+}
+
+
+@keyframes anim {
+    0% { transform: scale(0);}
+    30% {transform: scale(0.5)}
+    100% {transform: scale(1);}
+}
+
+/* #139A43;
+    #0B5D1E
+*/
+
+.select {
+    height: 70%;
+    width: 200px;
+    font-size: 20px;
+}   
+
+.select-name {
+    font-size: 20px;
+    margin-right: .5rem;
+    
 }

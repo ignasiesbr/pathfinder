@@ -4,18 +4,20 @@ import {cols, rows} from './utils/constants';
 
 
 const initialState = {
-    selectedAlgorithm: 0,
+    selectedAlgorithm: 2,
     visitPath: [],
     foundPath: [],
     grid: generateEmptyGrid(),
-    start: "" + (Math.floor(rows/2) + Math.floor(cols/4)*cols),
-    end: "" + (Math.floor(rows/2)*3 + Math.floor(cols/4)*cols),
+    start: "243",
+    end: "262",
     isDragging: false,
     addingWall: false,
     latestDrag: null,
     itemDragging: null,
     graphChange: {type:"", value:""}
 };
+
+console.log((Math.floor(rows/2) + Math.floor(cols/4)*cols),(Math.floor(rows/2)*3 + Math.floor(cols/4)*cols) )
 
 const algoSlice = createSlice({
     name:'algo',

@@ -4,22 +4,24 @@ import {setSelected} from '../AlgoSlice';
 
 
 
-const Header = ({selected, setSelected}) => {
+const Header = ({setSelected}) => {
 
     const handleDropdownChange = e => {
         setSelected(parseInt(e.target.value));
     }
 
-
     return (
-        <div>
-            Pathfinder visualizer
-            <select onChange={(e) => handleDropdownChange(e)} name="" id="">
+        <div className="header">
+            <div className="logo">
+                Pathfinder visualizer
+            </div>
+            <span className="select-name">Selected algorithm:</span>
+            <select defaultValue={2} className="select" onChange={(e) => handleDropdownChange(e)} name="" id="">
                     <option value={0}>BFS</option>
                     <option value={1}>DFS</option>
                     <option value={2}>Dijkstra</option>
-                    <option value={3}>A* algo</option>
-                </select>
+                    <option value={3}>A*</option>
+            </select>
         </div>
     )
 }

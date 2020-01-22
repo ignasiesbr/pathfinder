@@ -80,7 +80,7 @@ export const getPredList = (node, start) => {
     let list = [node.getValue()];
     let current = node;
     while (!done) {
-        if (!current.getPred() || count >= max || current.getValue() == start) {
+        if (!current.getPred() || count >= max || current.getValue() === start) {
             done = true;
         }
         else {

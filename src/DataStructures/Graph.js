@@ -2,7 +2,7 @@ import Node from "./Node";
 import Queue from "./Queue";
 import Stack from "./Stack";
 import PriorityQueue from "./PriorityQueue";
-import {cols, rows}  from '../utils/constants';
+import {cols}  from '../utils/constants';
 
 let calculateY = (endValue, acc) => {
   if (endValue < cols) {
@@ -91,7 +91,7 @@ class Graph {
         .getAdjacents()
         .forEach(
           adj =>
-            (s +=
+            (s = s+
               `( ${val} , ${adj.getValue()} , ${node[1].getWeight(adj)} )` +
               "\n")
         );
