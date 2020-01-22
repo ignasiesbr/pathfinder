@@ -1,68 +1,34 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Pathfinder grid visualizer using React.
 
-## Available Scripts
+This educational project can be checked in action in <https://ignasiesbr.github.io/pathfinder-react/>
 
-In the project directory, you can run:
+The algorithms implemented in this moment are:
 
-### `npm start`
+1. BFS
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+   Graph traversal algorithm. Can find the shortest path in unweighted graphs.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+2. DFS
 
-### `npm test`
+   Graph traversal algorithm. It does not find the shortest path.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Dijkstra
 
-### `npm run build`
+   Main shortest path algorithm.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4. A * 
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+   Informed search algorithm. It uses a heuristic to speed up the search for the shortest path.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+All the code in this repository uses the recent React feature *Hooks*.
 
-### `npm run eject`
+To navigate through the project here is some guidance:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
++ In the root of the *.src* folder we can find the *App.css*, *App.js*, *index.js* and finally the *AlgoSlice.js*. The three first files are self-explanatory. The *AlgoSlice.js* one is the one that takes care of creating the reducers and actions creators using the *@reduxjs/toolkit* that allows us to use Redux reducing its boilerplate.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
++ In the *components* folder we can find the *Cell, Header, Info and Pathfinder* components. These are the ones that give the main functionality to the project. Specially the *Cell and Pathfinder* ones.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
++ To calculate the various shortest paths the project creates a graph using the Data Structures found in the *DataStructures* folder inside the */src*.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Hope you like this small and quick project that I used to improve my knowledge in data structures and React.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
